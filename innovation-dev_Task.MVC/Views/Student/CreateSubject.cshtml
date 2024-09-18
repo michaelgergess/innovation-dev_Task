@@ -1,0 +1,18 @@
+﻿@model innovation_dev_Task.Application.DTOs.CreateSubjectDto
+
+<h2>Create Subject</h2>
+<a asp-controller="Student" asp-action="Create" class="btn btn-primary">Create Student</a>
+
+<form asp-action="CreateSubject" method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

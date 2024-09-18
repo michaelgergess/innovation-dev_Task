@@ -1,0 +1,137 @@
+﻿@model innovation_dev_Task.Application.DTOs.CreateStudentDto
+
+<h2>Create Student</h2>
+<a asp-controller="Student" asp-action="CreateSubject" class="btn btn-primary">Create Subject</a>
+
+<form asp-action="Create" method="post" id="studentForm">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" id="Name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+        <span id="nameErrorIcon" style="display:none;">X</span>
+        <span id="nameErrorMessage" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DateOfBirth"></label>
+        <input asp-for="DateOfBirth" class="form-control" id="DateOfBirth" type="date" />
+        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+        <span id="dobErrorIcon" style="display:none;">X</span>
+        <span id="dobErrorMessage" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" id="Email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+        <span id="emailErrorIcon" style="display:none;">X</span>
+        <span id="emailErrorMessage" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Address"></label>
+        <input asp-for="Address" class="form-control" id="Address" />
+    </div>
+
+    @if (ViewBag.Subjects != null && ((IEnumerable<innovation_dev_Task.Application.DTOs.SubjectDto>)ViewBag.Subjects).Any())
+    {
+        <div class="form-group">
+            <label>Subjects (Choose up to 2)</label>
+            <div id="subjectErrorMessage" class="text-danger"></div>
+            @foreach (var subject in (IEnumerable<innovation_dev_Task.Application.DTOs.SubjectDto>)ViewBag.Subjects)
+            {
+                <div>
+                    <input type="checkbox" name="SelectedSubjectIds" value="@subject.Id" id="subject_@subject.Id" class="subject-checkbox" />
+                    <label for="subject_@subject.Id">@subject.Name</label>
+                </div>
+            }
+        </div>
+
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            No subjects available. <a href="@Url.Action("CreateSubject", "Student")" class="btn btn-link">Create a Subject</a>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('studentForm').addEventListener('submit', function (event) {
+            clearErrors();
+
+            let isValid = true;
+
+            // Name Validation
+            const nameInput = document.getElementById('Name');
+            const nameValue = nameInput.value;
+            const namePattern = /^[a-zA-Z\s]+$/;
+            if (!namePattern.test(nameValue)) {
+                showError('nameErrorIcon', 'nameErrorMessage', 'Name contains numbers or special characters.');
+                isValid = false;
+            }
+
+            // Date of Birth Validation
+            const dobInput = document.getElementById('DateOfBirth');
+            const dobValue = new Date(dobInput.value);
+            const age = calculateAge(dobValue);
+            if (age < 15) {
+                showError('dobErrorIcon', 'dobErrorMessage', 'Student age must be more than 15 years.');
+                isValid = false;
+            }
+
+            // Email Validation
+            const emailInput = document.getElementById('Email');
+            const emailValue = emailInput.value;
+            const emailPattern = /^[a-zA-Z0-9_.+-]+@@[a-zA-Z0-9-]+\.[a-zA-Z0-9.-]+$/;
+            if (!emailPattern.test(emailValue)) {
+                showError('emailErrorIcon', 'emailErrorMessage', 'Invalid email address.');
+                isValid = false;
+            }
+
+            // Subject Validation
+            const subjects = document.querySelectorAll('.subject-checkbox:checked');
+            if (subjects.length === 0) {
+                document.getElementById('subjectErrorMessage').textContent = 'At least one subject must be selected.';
+                isValid = false;
+            } else if (subjects.length > 2) {
+                document.getElementById('subjectErrorMessage').textContent = 'You can select a maximum of 2 subjects.';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+
+        function showError(iconId, messageId, message) {
+            document.getElementById(iconId).style.display = 'inline';
+            document.getElementById(messageId).textContent = message;
+        }
+
+        function clearErrors() {
+            document.getElementById('nameErrorIcon').style.display = 'none';
+            document.getElementById('nameErrorMessage').textContent = '';
+            document.getElementById('dobErrorIcon').style.display = 'none';
+            document.getElementById('dobErrorMessage').textContent = '';
+            document.getElementById('emailErrorIcon').style.display = 'none';
+            document.getElementById('emailErrorMessage').textContent = '';
+            document.getElementById('subjectErrorMessage').textContent = '';
+        }
+
+        function calculateAge(birthDate) {
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+    </script>
+}
+

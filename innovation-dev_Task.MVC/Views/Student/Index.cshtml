@@ -1,0 +1,35 @@
+﻿@model IEnumerable<innovation_dev_Task.Application.DTOs.StudentDto>
+
+<h2>All Students</h2>
+<a asp-controller="Student" asp-action="Create" class="btn btn-primary">Create Student</a>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">
+        No students found.
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Date of Birth</th>
+                <th>Email</th>
+                <th>Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var student in Model)
+            {
+                <tr>
+                    <td>@student.Name</td>
+                    <td>@student.DateOfBirth.ToString("yyyy-MM-dd")</td>
+                    <td>@student.Email</td>
+                    <td>@student.Address</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
